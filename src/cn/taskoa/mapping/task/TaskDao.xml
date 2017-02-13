@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.taskoa.task.dao.TaskDao">
+
+	<select id="listByCreator" resultType="Task">
+		SELECT
+			t.taskid AS taskid,
+			t.taskno AS taskno,
+			t.taskname AS taskname,
+			u.username AS "operator.username",
+			t.time_start AS time_start,
+			t.time_end AS time_end,
+			t.time_created AS time_created,
+			t.taskstat AS taskstat
+		FROM 
+			t_task t, 
+			t_user u
+		WHERE
+			t.creator_userid = #{creator_userid} 
+			AND t.del_flag = 0 
+			AND u.userid = t.operator_userid
+		ORDER BY 
+			t.time_created DESC 
+		LIMIT 
+			#{rowIndex} , #{rowNum}
+	</select>
+	
+	<select id="countByCreator" resultType="int">
+		SELECT 
+			COUNT(1) 
+		FROM 
+			t_task
+		WHERE 
+			creator_userid = #{creator_userid} 
+			AND del_flag = 0
+	</select>
+	
+	<select id="listByTaskid" resultType="Task">
+		SELECT
+			t.taskid AS taskid,
+			t.taskname AS taskname,
+			t.taskno AS taskno,
+			u.username AS "operator.username",
+			t.time_start AS time_start,
+			t.time_end AS time_end,
+			t.time_created AS time_created,
+			t.taskstat AS taskstat,
+			t.taskdesc AS taskdesc,
+			f.taskfileid AS "taskfile.taskfileid",
+			f.taskfilename AS "taskfile.taskfilename",
+			f.operatime AS "taskfile.operatime"
+		FROM 
+			t_task t
+		JOIN t_user u ON ( 
+			t.taskid = #{taskid}
+			AND t.del_flag = 0
+			AND t.creator_userid = #{creator_userid}
+			AND t.operator_userid = u.userid 
+		)
+		LEFT JOIN t_taskfile f ON (
+			f.taskid = t.taskid 
+			AND f.taskfiletype = #{taskfiletype}
+		)
+	</select>
+	
+	<update id="updateTaksInfo">
+		UPDATE 
+			t_task
+		SET 
+			taskname = #{task.taskname},
+			time_start = #{task.time_start},
+			time_end = #{task.time_end},
+			taskdesc = #{task.taskdesc}
+		WHERE 
+			taskid = #{task.taskid}
+			AND creator_userid = #{creator_userid} 
+			AND del_flag = 0
+	</update>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<insert id="insert" parameterType="Task" useGeneratedKeys="true" keyProperty="taskid">
+		INSERT INTO t_task
+		(taskname,creator_userid,operator_userid,taskdesc,time_start,time_end,time_created,taskstat,del_flag)
+		VALUES
+		(#{taskname},#{creator_userid},#{operator_userid},#{taskdesc},#{time_start},#{time_end},#{time_created},#{taskstat},#{del_flag})
+	</insert>
+	
+	<select id="get" resultType="Task">
+		SELECT
+			t.taskid AS taskid,
+			t.taskno AS taskno,
+			t.taskname AS taskname,
+			u.username AS "creator.username",
+			t.time_start AS time_start,
+			t.time_end AS time_end,
+			t.time_created AS time_created,
+			t.taskstat AS taskstat,
+			t.taskdesc AS taskdesc,
+			t.resultdesc AS resultdesc
+		FROM
+			t_task t,
+			t_user u
+		WHERE
+			t.taskid = #{taskid}
+			AND t.del_flag = 0
+			AND u.userid = t.creator_userid
+	</select>
+	
+	<update id="update" parameterType="Task">
+		UPDATE 
+			t_task
+		SET 
+			taskdesc = #{task.taskdesc},
+			time_start = #{task.time_start},
+			time_end = #{task.time_end}
+		WHERE 
+			taskid = #{task.taskid} 
+			AND del_flag = 0
+	</update>
+	
+	<update id="deleteTask">
+		UPDATE 
+			t_task
+		SET 
+			del_flag = 1
+		WHERE 
+			taskid = #{taskid}
+			AND creator_userid = #{creator_userid}
+			AND del_flag = 0
+	</update>
+	
+	
+
+	
+	
+	
+	
+	<select id="findTaskAndResultByTaskid" resultType="Task">
+		SELECT
+			t.taskid AS taskid,
+			t.taskname AS taskname,
+			t.taskno AS taskno,
+			u.username AS "operator.username",
+			t.time_start AS time_start,
+			t.time_end AS time_end,
+			t.time_created AS time_created,
+			t.taskstat AS taskstat,
+			t.taskdesc AS taskdesc,
+			t.resultdesc AS resultdesc,
+			f.taskfileid AS "taskfile.taskfileid",
+			f.taskfilename AS "taskfile.taskfilename",
+			f.taskfiletype AS "taskfile.taskfiletype",
+			f.operatime AS "taskfile.operatime"
+		FROM
+			t_task t
+		JOIN t_user u ON (
+			t.taskid = #{taskid}
+			AND t.creator_userid = #{creator_userid}
+			AND t.del_flag = 0 
+			AND t.operator_userid = u.userid
+		)
+		LEFT JOIN t_taskfile f ON (
+			f.taskid = t.taskid
+		)
+	</select>
+	
+	<select id="getCountByOperator" resultType="int">
+		SELECT 
+			COUNT(1) 
+		FROM 
+			t_task
+		WHERE 
+			operator_userid = #{operator_userid} 
+			AND del_flag = 0
+	</select>
+	
+	<select id="findByOperator" resultType="Task">
+		SELECT
+			t.taskid AS taskid,
+			t.taskno AS taskno,
+			t.taskname AS taskname,
+			u.username AS "creator.username",
+			t.time_start AS time_start,
+			t.time_end AS time_end,
+			t.time_created AS time_created,
+			t.taskstat AS taskstat
+		FROM
+			t_task t,
+			t_user u
+		WHERE
+			t.operator_userid = #{operator_userid}
+			AND t.del_flag = 0
+			AND u.userid = t.creator_userid
+		ORDER BY
+			t.time_created DESC 
+		LIMIT
+			#{rowIndex} , #{rowNum}
+	</select>
+	
+	<update id="updateResultByTaskid">
+		UPDATE 
+			t_task
+		SET 
+			resultdesc = #{resultdesc}
+		WHERE
+			taskid = #{taskid}
+			AND del_flag = 0
+	</update>
+
+</mapper>

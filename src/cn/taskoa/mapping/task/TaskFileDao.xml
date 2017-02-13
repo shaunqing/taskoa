@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.taskoa.task.dao.TaskFileDao">
+
+	<select id="getByTaskFileIdAndCrearot" resultType="String">
+		SELECT
+			f.taskfileurl
+		FROM
+			t_taskfile f
+		JOIN t_task t ON (
+			f.taskfileid = #{taskfileid}
+			AND f.taskid = t.taskid
+			AND t.creator_userid = #{creator_userid}
+		)		
+	</select>
+
+	<delete id="delete">
+		DELETE
+		FROM
+			t_taskfile
+		WHERE
+			taskfileid = #{taskfileid}
+	</delete>
+
+
+
+
+
+	<select id="get" resultType="TaskFile">
+		select * from t_taskfile where taskfileid = #{taskfileid}
+	</select>
+
+	<select id="getWithUser" resultType="Task">
+		SELECT
+			f.taskfilename AS "taskfile.taskfilename",
+			f.taskfileurl AS "taskfile.taskfileurl",
+			t.creator_userid AS creator_userid,
+			t.operator_userid AS operator_userid
+		FROM
+			t_taskfile f
+		JOIN t_task t ON (
+			f.taskfileid = #{taskfileid}
+			AND f.taskid = t.taskid
+		)
+	</select>
+
+	<insert id="insert" parameterType="TaskFile">
+		INSERT INTO t_taskfile
+		(taskid,taskfilename,taskfileurl,taskfiletype)
+		VALUES
+		(#{taskid},#{taskfilename},#{taskfileurl},#{taskfiletype})
+	</insert>
+
+	<insert id="insertTaskFiles" parameterType="TaskFile">
+		INSERT INTO t_taskfile
+		(taskid,taskfilename,taskfileurl,taskfiletype)
+		VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.taskid},#{item.taskfilename},#{item.taskfileurl},#{item.taskfiletype})
+		</foreach>
+	</insert>
+
+	<select id="getCountByTaskid" resultType="int">
+		SELECT COUNT(1) FROM
+		t_taskfile WHERE taskid =
+		#{taskid}
+	</select>
+
+	<select id="getTaskFileByTaskid" resultType="TaskFile">
+		SELECT
+		taskfileid,
+		taskfilename,
+		taskfileurl
+		FROM
+		t_taskfile
+		WHERE
+		taskid = #{taskid}
+	</select>
+
+	<update id="updateTaskFiles" parameterType="TaskFile">
+		<foreach collection="list" item="item" index="index" open=""
+			close="" separator=";">
+			UPDATE t_taskfile
+			<set>taskfileurl = #{item.taskfileurl}</set>
+			WHERE
+			taskfileid = #{item.taskfileid}
+		</foreach>
+	</update>
+
+	<delete id="deleteTaksFile">
+		DELETE FROM t_taskfile WHERE taskfileid =
+		#{taskfileid}
+		AND taskfiletype = #{taskfiletype}
+	</delete>
+
+</mapper>
