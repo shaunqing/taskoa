@@ -34,7 +34,8 @@ public class LoginService extends BaseService {
 			cUser.setPassword("");
 			cUser.setUserid(user.getUserid());
 			cUser.setUsername(user.getUsername());
-
+			cUser.setRole(user.getRole());
+			
 			return true;
 		} else {
 			return false;
