@@ -38,19 +38,19 @@ public class TaskController extends BaseController {
 	 */
 	@RequestMapping(value = "/mylist/{pageNo}", method = RequestMethod.GET)
 	public String list(CurrentUser cUser, @PathVariable("pageNo") int pageNo, HttpSession session, Model model) {
-		PageModel<Task> pageModel = taskService.find(cUser.getUserid(), pageNo);
+		PageModel<Task> pageModel = taskService.listByCreator(cUser.getUserid(), pageNo);
 		pageModel.setCurrentPage(pageNo);
 		model.addAttribute("pageModel", pageModel);
 		return "modules/task/taskMyList";
 	}
 
 	/**
-	 * 显示某个任务的详情
+	 * 创建人查看任务
 	 */
 	@RequestMapping(value = "/myview/{taskid}", method = RequestMethod.GET)
 	public String view(CurrentUser cUser, @PathVariable("taskid") int taskid, Model model) {
 		// 获取当前用户的taskid的任务、附件和结果
-		List<Task> tasks = taskService.getTaskAndResultFile(cUser.getUserid(), taskid);
+		List<Task> tasks = taskService.listTaskAndFile(cUser.getUserid(), taskid);
 
 		// 任务附件文件
 		List<TaskFile> fjFiles = new ArrayList<>();
@@ -99,7 +99,7 @@ public class TaskController extends BaseController {
 	 */
 	@RequestMapping("/mydown/{taskfileid}")
 	public ResponseEntity<byte[]> downloadTaskFile(CurrentUser cUser, @PathVariable("taskfileid") int taskfileid) throws NotFoundResourceExceptions {
-		return taskService.downloadTaskFile(cUser.getUserid(),taskfileid);
+		return taskService.downloadTaskFile(cUser,taskfileid);
 	}
 	
 	/**
@@ -120,7 +120,7 @@ public class TaskController extends BaseController {
 	}
 	
 	/**
-	 * 给发起人显示要修改的任务
+	 * 给创建人显示要修改的任务
 	 */
 	@RequestMapping(value = "/mytask/{taskid}")
 	public String preUpdate(CurrentUser cUser, @PathVariable("taskid") int taskid, Model model) {
@@ -130,28 +130,26 @@ public class TaskController extends BaseController {
 	}
 	
 	/**
-	 * 发起人修改任务信息，不包括附件
+	 * 创建人修改任务信息，不包括附件
 	 */
 	@RequestMapping(value = "/myupdateTask", method = RequestMethod.POST)
 	public String update(CurrentUser cUser, Task taskNew, RedirectAttributes redirectAttributes) {
 		String result = "success";
 		// 参数有效性验证
-		if(!beanValidator(redirectAttributes, taskNew)) {
-			return "redirect:/task/mytask/" + taskNew.getTaskid();
+		if (beanValidator(redirectAttributes, taskNew)) {
+			// 执行修改功能
+			result = taskService.updateTaskInfo(cUser.getUserid(), taskNew);
+			if ("success".equals(result)) {
+				addMessage(redirectAttributes, Message.SUCCESS, "修改成功！");
+			} else {
+				addMessage(redirectAttributes, Message.DANGER, result);
+			}
 		}
-		
-		result = taskService.updateTaskInfo(cUser.getUserid(), taskNew);
-		if("success".equals(result)) {
-			addMessage(redirectAttributes, Message.SUCCESS, "修改成功！");
-			return "redirect:/task/mylist/1";
-		} else {
-			addMessage(redirectAttributes, Message.DANGER, result);
-			return "redirect:/task/mytask/" + taskNew.getTaskid();
-		}
+		return "redirect:/task/mytask/" + taskNew.getTaskid();
 	}
 	
 	/**
-	 * 发起人删除任务附件
+	 * 创建人删除任务附件
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/mydeletefile0/{taskfileid}", produces = "text/html;charset=UTF-8")

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.taskoa.common.filter.CurrentUser;
 import cn.taskoa.common.properties.Global;
 import cn.taskoa.common.service.BaseService;
 import cn.taskoa.common.utils.FileOperateUtil;
@@ -26,20 +27,6 @@ public class TaskService extends BaseService {
 	
 	@Autowired
 	private TaskFileDao taskFileDao;
-
-	// 回滚
-	@Transactional(readOnly = false)
-	public void save() throws Exception {
-		
-
-	}
-
-	public void list() {
-
-	}
-
-	/*----- 以上是测试内容 -------*/
-	
 	
 	/**
 	 * 查询登录者创建的任务
@@ -47,7 +34,7 @@ public class TaskService extends BaseService {
 	 * @param pageNo
 	 * @return
 	 */
-	public PageModel<Task> find(int creator_userid, int pageNo) {
+	public PageModel<Task> listByCreator(int creator_userid, int pageNo) {
 		PageModel<Task> pageModel = new PageModel<>();
 		int rowIndex = (pageNo - 1) * pageModel.getPageSize();
 
@@ -64,19 +51,22 @@ public class TaskService extends BaseService {
 	 * @param taskid 任务id
 	 * @return
 	 */
-	public List<Task> getTaskAndResultFile(int creator_userid, int taskid) {
-		return dao.findTaskAndResultByTaskid(creator_userid, taskid);
+	public List<Task> listTaskAndFile(int creator_userid, int taskid) {
+		return dao.listByTaskid(creator_userid, taskid, "all");
 	}
 	
 	/**
-	 * 下载文件
+	 * 下载文件，用户必须是创建人或执行人或管理员
 	 * @param taskfileid
 	 * @return
 	 * @throws NotFoundResourceExceptions 
 	 */
-	public ResponseEntity<byte[]> downloadTaskFile(int cuser_id, int taskfileid) throws NotFoundResourceExceptions {
+	public ResponseEntity<byte[]> downloadTaskFile(CurrentUser cUser, int taskfileid)
+			throws NotFoundResourceExceptions {
 		Task task = taskFileDao.getWithUser(taskfileid);
-		if (task != null && (task.getCreator_userid() == cuser_id || task.getOperator_userid() == cuser_id)) {
+		// 判断用户身份，是创建人或执行人或管理员
+		if (task != null && ("admin".equals(cUser.getRole()) || task.getCreator_userid() == cUser.getUserid()
+				|| task.getOperator_userid() == cUser.getUserid())) {
 			File file = new File(Global.getConfig("TASKFILE_URL") + task.getTaskfile().getTaskfileurl());
 			return FileOperateUtil.downloadFile(task.getTaskfile().getTaskfilename(), file);
 		} else {
@@ -101,7 +91,7 @@ public class TaskService extends BaseService {
 	}
 	
 	/**
-	 * 给发起人显示任务信息和附件
+	 * 给创建人显示任务信息和附件
 	 * @param userid
 	 * @param taskid
 	 * @param taskfiletype
@@ -144,7 +134,7 @@ public class TaskService extends BaseService {
 		String result = "";
 		try {
 			// 用文件id和用户id，查询该文件是否存在
-			String taskFileUrl = taskFileDao.getByTaskFileIdAndCrearot(taskfileid, userid);
+			String taskFileUrl = taskFileDao.getByIdAndCreator(taskfileid, userid);
 			if (taskFileUrl == null || ("").equals(taskFileUrl)) {
 				return "操作的文件不存在！";
 			}

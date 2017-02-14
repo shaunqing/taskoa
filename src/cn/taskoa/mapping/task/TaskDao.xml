@@ -37,6 +37,10 @@
 	
 	<select id="listByTaskid" resultType="Task">
 		SELECT
+			<if test="taskfiletype == 'all'">
+				t.resultdesc AS resultdesc,
+				f.taskfiletype AS "taskfile.taskfiletype",
+			</if>
 			t.taskid AS taskid,
 			t.taskname AS taskname,
 			t.taskno AS taskno,
@@ -58,10 +62,23 @@
 			AND t.operator_userid = u.userid 
 		)
 		LEFT JOIN t_taskfile f ON (
-			f.taskid = t.taskid 
-			AND f.taskfiletype = #{taskfiletype}
+			f.taskid = t.taskid
+			<if test="taskfiletype != 'all'">
+				AND f.taskfiletype = #{taskfiletype}
+			</if>
 		)
 	</select>
+	
+	<update id="deleteTask">
+		UPDATE 
+			t_task
+		SET 
+			del_flag = 1
+		WHERE 
+			taskid = #{taskid}
+			AND creator_userid = #{creator_userid}
+			AND del_flag = 0
+	</update>
 	
 	<update id="updateTaksInfo">
 		UPDATE 
@@ -127,16 +144,7 @@
 			AND del_flag = 0
 	</update>
 	
-	<update id="deleteTask">
-		UPDATE 
-			t_task
-		SET 
-			del_flag = 1
-		WHERE 
-			taskid = #{taskid}
-			AND creator_userid = #{creator_userid}
-			AND del_flag = 0
-	</update>
+	
 	
 	
 

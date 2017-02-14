@@ -20,7 +20,6 @@ public class TestDao {
 	
 	@Test
 	public void test() throws Exception {
-		String s = fDao.getByTaskFileIdAndCrearot(59, 1);
-		System.out.println(s);
+		System.out.println("");
 	}
 }

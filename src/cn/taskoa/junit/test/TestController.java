@@ -46,7 +46,6 @@ public class TestController extends BaseController {
 		if(beanValidator(model, t)) {
 			System.out.println(t.getId());
 			System.out.println(t.getName());
-			taskService.list();
 
 			Message m = new Message();
 			m.setCtype("success");

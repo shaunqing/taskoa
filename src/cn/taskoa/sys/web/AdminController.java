@@ -21,7 +21,6 @@ public class AdminController extends BaseController {
 	 */
 	@RequestMapping("/loginout")
 	public String loginout(HttpSession session) {
-		taskService.find(0, 0);
 		return "redirect:sys";
 	}
 }

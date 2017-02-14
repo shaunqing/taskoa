@@ -139,9 +139,9 @@
 					<a href="#"><i class="fa fa-tasks fa-fw"></i>任务单管理 <span class="fa arrow"></span></a>
 					<ul class="nav nav-second-level">
 						<li><a href="task/showTaskAdd">创建新任务</a></li>
-						<li><a href="task/showCreated">我创建的任务</a></li>
-						<li><a href="task/showDepart">部门内任务</a></li>
+						<li><a href="${ctx}/task/mylist/1">我创建的任务</a></li>
 						<li><a href="task/showTodo">被分配任务</a></li>
+						<li><a href="task/showDepart">部门内任务</a></li>
 						<li><a href="task/showShare">共享的任务</a></li>
 					</ul>
 				</li>

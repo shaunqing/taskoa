@@ -63,9 +63,9 @@ $(function() {
 											</c:otherwise>
 										</c:choose></td>
 										<td>${task.operator.username}</td>
-										<td>${fn:substring(task.time_start,0,16)}</td>
-										<td>${fn:substring(task.time_end,0,16)}</td>
-										<td>${fn:substring(task.time_created,0,16)}</td>
+										<td>${fn:substring(task.time_start,0,19)}</td>
+										<td>${fn:substring(task.time_end,0,19)}</td>
+										<td>${fn:substring(task.time_created,0,19)}</td>
 										<td>${task.taskstat}</td>
 										<td><c:choose>
 												<c:when test="${task.taskstat == '待完成'}">

@@ -32,11 +32,19 @@ public interface TaskDao extends BaseDao {
 	 * 根据taskid获取任务和任务附件
 	 * @param creator_userid
 	 * @param taskid
-	 * @param taskfiletype
+	 * @param taskfiletype 值为all时，返回所有类型的文件，并返回resultdesc和taskfiletype
 	 * @return
 	 */
 	public List<Task> listByTaskid(@Param("creator_userid") int creator_userid, @Param("taskid") int taskid,
 			@Param("taskfiletype") String taskfiletype);
+	
+	
+	/**
+	 * 将任务删除位置位1
+	 * @param creator_userid 发起人id
+	 * @param taskid 任务id
+	 */
+	public int deleteTask(@Param("creator_userid") int creator_userid, @Param("taskid") int taskid) throws Exception;
 	
 	/**
 	 * 发起人更新任务信息
@@ -86,10 +94,5 @@ public interface TaskDao extends BaseDao {
 	public void updateResultByTaskid(@Param("taskid") int taskid, @Param("resultdesc") String resultdesc)
 			throws Exception;
 	
-	/**
-	 * 将任务删除位置位1
-	 * @param creator_userid 发起人id
-	 * @param taskid 任务id
-	 */
-	public int deleteTask(@Param("creator_userid") int creator_userid,@Param("taskid") int taskid) throws Exception;
+	
 }

@@ -4,7 +4,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.taskoa.task.dao.TaskFileDao">
 
-	<select id="getByTaskFileIdAndCrearot" resultType="String">
+	<select id="getWithUser" resultType="Task">
+		SELECT
+			f.taskfilename AS "taskfile.taskfilename",
+			f.taskfileurl AS "taskfile.taskfileurl",
+			t.creator_userid AS creator_userid,
+			t.operator_userid AS operator_userid
+		FROM
+			t_taskfile f
+		JOIN t_task t ON (
+			f.taskfileid = #{taskfileid}
+			AND f.taskid = t.taskid
+		)
+	</select>
+	
+	<select id="getByIdAndCreator" resultType="String">
 		SELECT
 			f.taskfileurl
 		FROM
@@ -28,23 +42,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
 
-	<select id="get" resultType="TaskFile">
-		select * from t_taskfile where taskfileid = #{taskfileid}
-	</select>
 
-	<select id="getWithUser" resultType="Task">
-		SELECT
-			f.taskfilename AS "taskfile.taskfilename",
-			f.taskfileurl AS "taskfile.taskfileurl",
-			t.creator_userid AS creator_userid,
-			t.operator_userid AS operator_userid
-		FROM
-			t_taskfile f
-		JOIN t_task t ON (
-			f.taskfileid = #{taskfileid}
-			AND f.taskid = t.taskid
-		)
-	</select>
+	
 
 	<insert id="insert" parameterType="TaskFile">
 		INSERT INTO t_taskfile

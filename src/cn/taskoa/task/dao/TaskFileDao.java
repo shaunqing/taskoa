@@ -11,13 +11,20 @@ import cn.taskoa.task.entity.TaskFile;
 public interface TaskFileDao extends BaseDao {
 
 	/**
+	 * 获取文件名称、路径，以及任务创建人和完成人
+	 * @param taskfileid
+	 * @return
+	 */
+	public Task getWithUser(@Param("taskfileid") int taskfileid);
+	
+	/**
 	 * 根据任务文件id和创建者id，查询文件路径
 	 * @param taskfileid
 	 * @param creator_userid
 	 * @return
 	 * @throws Exception
 	 */
-	public String getByTaskFileIdAndCrearot(@Param("taskfileid") int taskfileid,
+	public String getByIdAndCreator(@Param("taskfileid") int taskfileid,
 			@Param("creator_userid") int creator_userid) throws Exception;
 
 	/**
@@ -30,12 +37,4 @@ public interface TaskFileDao extends BaseDao {
 	
 	
 	
-	
-	
-	
-	
-	public TaskFile get(@Param("taskfileid") int taskfileid) throws Exception;
-	
-	
-	public Task getWithUser(@Param("taskfileid") int taskfileid);
 }
