@@ -1,11 +1,11 @@
 package cn.taskoa.sys.dao;
 
-import cn.taskoa.common.dao.CrudDao;
+import cn.taskoa.common.dao.BaseDao;
 import cn.taskoa.common.dao.MyBatisDao;
 import cn.taskoa.sys.entity.User;
 
 @MyBatisDao
-public interface UserDao extends CrudDao<User> {
+public interface UserDao extends BaseDao {
 
 	/**
 	 * 根据用户名返回记录
