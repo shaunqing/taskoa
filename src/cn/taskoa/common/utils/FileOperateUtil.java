@@ -52,7 +52,7 @@ public class FileOperateUtil {
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 */
-	public String uploadMultipartFile(String root, MultipartFile multipartFile, int userid)
+	public static String uploadMultipartFile(String root, MultipartFile multipartFile, int userid)
 			throws IllegalStateException, IOException {
 		if (multipartFile != null) {
 			String originalFilename = multipartFile.getOriginalFilename();

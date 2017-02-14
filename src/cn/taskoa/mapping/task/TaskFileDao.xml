@@ -38,6 +38,79 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			taskfileid = #{taskfileid}
 	</delete>
 
+	<select id="getByTaskidAndType" resultType="TaskFile">
+		SELECT
+			f.taskfileid,
+			f.creator_userid,
+			f.operator_userid,
+			f.taskfilename,
+			f.taskfileurl,
+			f.operatime
+		FROM
+			t_taskfile f
+		WHERE
+			f.taskid = #{detail.taskid}
+			AND f.taskfiletype = #{detail.taskfiletype}
+			<if	test="detail.taskfiletype == 'fj'">
+				AND f.creator_userid = #{detail.cUser.userid}
+			</if>
+			<if	test="detail.taskfiletype == 'jg'">
+				AND f.operator_userid = #{detail.cUser.userid}
+			</if>
+	</select>
+
+	<update id="updateTaskFiles" parameterType="TaskFile">
+		<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+			UPDATE 
+				t_taskfile
+			<set>
+				taskfileurl = #{item.taskfileurl}
+			</set>
+			WHERE
+				taskfileid = #{item.taskfileid}
+		</foreach>
+	</update>
+
+	<insert id="batchInsert" parameterType="TaskFile">
+		INSERT INTO t_taskfile (
+			taskid,
+			creator_userid,
+			operator_userid,
+			taskfilename,
+			taskfileurl,
+			taskfiletype
+		)
+		VALUES
+		<foreach collection="list" item="item" index="index" separator=",">
+		(
+			#{item.taskid},
+			#{item.creator_userid},
+			#{item.operator_userid},
+			#{item.taskfilename},
+			#{item.taskfileurl},
+			#{item.taskfiletype}
+		)
+		</foreach>
+	</insert>
+	
+	<insert id="insert" parameterType="TaskFile">
+		INSERT INTO t_taskfile (
+			taskid,
+			creator_userid,
+			operator_userid,
+			taskfilename,
+			taskfileurl,
+			taskfiletype
+		)
+		VALUES (
+			#{taskid},
+			#{creator_userid},
+			#{operator_userid},
+			#{taskfilename},
+			#{taskfileurl},
+			#{taskfiletype}
+		)
+	</insert>
 
 
 
@@ -45,22 +118,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	
 
-	<insert id="insert" parameterType="TaskFile">
-		INSERT INTO t_taskfile
-		(taskid,taskfilename,taskfileurl,taskfiletype)
-		VALUES
-		(#{taskid},#{taskfilename},#{taskfileurl},#{taskfiletype})
-	</insert>
+	
 
-	<insert id="insertTaskFiles" parameterType="TaskFile">
-		INSERT INTO t_taskfile
-		(taskid,taskfilename,taskfileurl,taskfiletype)
-		VALUES
-		<foreach collection="list" item="item" index="index"
-			separator=",">
-			(#{item.taskid},#{item.taskfilename},#{item.taskfileurl},#{item.taskfiletype})
-		</foreach>
-	</insert>
+	
 
 	<select id="getCountByTaskid" resultType="int">
 		SELECT COUNT(1) FROM

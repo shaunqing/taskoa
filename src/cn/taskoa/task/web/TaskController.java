@@ -13,12 +13,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import cn.taskoa.common.filter.CurrentUser;
+import cn.taskoa.common.utils.FileTypeUtil;
 import cn.taskoa.common.utils.Message;
 import cn.taskoa.common.utils.PageModel;
+import cn.taskoa.common.utils.TaskFileDetail;
 import cn.taskoa.common.utils.exceptions.NotFoundResourceExceptions;
 import cn.taskoa.common.key.TasKey;
 import cn.taskoa.common.web.BaseController;
@@ -113,11 +117,13 @@ public class TaskController extends BaseController {
 			int taskid = Integer.valueOf(req.getParameter("taskid"));
 			result = taskService.deleteTask(cUser.getUserid(), taskid);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("loginname: " + cUser.getLoginname() + "; " + e.getLocalizedMessage());
 			result = "删除出现异常！";
 		}
 		return result;
 	}
+	
+	/*----- 创建人修改任务 -----*/
 	
 	/**
 	 * 给创建人显示要修改的任务
@@ -155,6 +161,59 @@ public class TaskController extends BaseController {
 	@RequestMapping(value = "/mydeletefile0/{taskfileid}", produces = "text/html;charset=UTF-8")
 	public String deleteFJ(CurrentUser cUser, @PathVariable("taskfileid") int taskfileid) {
 		return taskService.deleteTaskFile(cUser.getUserid(), taskfileid);
+	}
+	
+	/**
+	 * 创建人更新任务附件（未测试）
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/myupdatefile0", method = RequestMethod.POST, produces = "application/json;charset=utf8")
+	public Message updateFJ(CurrentUser cUser, @RequestParam("taskFile") MultipartFile[] taskFiles,
+			HttpServletRequest request) {
+		try {
+			int taskid = Integer.valueOf(request.getParameter("taskid"));
+			return updateFjOrJg(cUser, taskid, TasKey.TASKFILE_FJ, taskFiles);
+		} catch (Exception e) {
+			logger.error("loginname: " + cUser.getLoginname() + "; " + e.getLocalizedMessage());
+			Message message = new Message("不存在该任务！", Message.DANGER);
+			return message;
+		}
+	}
+	
+	/**
+	 * 用于创建人更新任务附件文件，或执行人更新任务结果文件
+	 * @param cUser
+	 * @param taskid
+	 * @param taskfiletype
+	 * @param taskFiles
+	 * @return
+	 */
+	private Message updateFjOrJg(CurrentUser cUser, int taskid, String taskfiletype, MultipartFile[] taskFiles) {
+		Message message = new Message();
+
+		// 判断文件个数、文件头、文件后缀是否正确
+		String result = FileTypeUtil.checkFilesNumberAndType(taskFiles);
+
+		switch (result) {
+		case "EMPTYFILE":
+			result = "文件为空！";
+			message.setCtype(Message.DANGER);
+			break;
+		case "SUCCESS":
+			try {
+				TaskFileDetail fileDetail = new TaskFileDetail(cUser, taskid, taskfiletype);
+				result = taskService.updateTaskFile(fileDetail, taskFiles);
+				message.setCtype(Message.SUCCESS);
+			} catch (Exception e) {
+				logger.error("loginname: " + cUser.getLoginname() + "; " + e.getLocalizedMessage());
+				result = "上传文件异常！";
+				message.setCtype(Message.DANGER);
+			}
+			break;
+		}
+
+		message.setContent(result);
+		return message;
 	}
 
 }
