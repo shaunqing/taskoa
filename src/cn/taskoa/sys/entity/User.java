@@ -8,6 +8,7 @@ public class User {
 	private String username;// 用户姓名
 	private String password;// 登录密码
 	private int usergroupid;// 用户组表id
+	private String role; // 角色
 
 	public int getUserid() {
 		return userid;
@@ -55,6 +56,14 @@ public class User {
 
 	public void setUsergroupid(int usergroupid) {
 		this.usergroupid = usergroupid;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 }
