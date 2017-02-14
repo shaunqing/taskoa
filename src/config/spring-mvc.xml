@@ -23,18 +23,29 @@
 			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
 		    	<constructor-arg value="UTF-8" />
 			</bean>
-			<!-- Jackson2HttpMessageConverter-->
-			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-                <property name="supportedMediaTypes">
-                	<list><value>application/json;charset=UTF-8</value></list>
-                </property>
-            </bean>
 		</mvc:message-converters>
 		<!-- 获取已登录用户 -->
 		<mvc:argument-resolvers>  
             <bean class="cn.taskoa.common.filter.CurrentUserArgumentResolver" />
         </mvc:argument-resolvers>
 	</mvc:annotation-driven>
+	
+	<!-- 设置json和response的字符编码，不设置会导致下载的文件无法正常打开 -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+				<ref bean="stringHttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+	<bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>text/plain;charset=UTF-8</value>
+			</list>
+		</property>
+	</bean>
 	
 	<!-- ????? -->
     <!-- REST中根据URL后缀自动判定Content-Type及相应的View -->
