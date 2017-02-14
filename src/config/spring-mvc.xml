@@ -82,8 +82,17 @@
 			<mvc:mapping path="/task/**" />
 			<!-- 不拦截显示登录页面的路径 -->
 			<mvc:exclude-mapping path="/sys"/>
+			<mvc:exclude-mapping path="/error/**"/>
 			<mvc:exclude-mapping path="/loginout"/>
 			<bean class="cn.taskoa.common.interceptor.LoginInterceptor" />
+		</mvc:interceptor>
+		<!-- 拦截管理员权限 -->
+		<mvc:interceptor>
+			<mvc:mapping path="/a/**" />
+			<mvc:exclude-mapping path="/sys"/>
+			<mvc:exclude-mapping path="/error/**"/>
+			<mvc:exclude-mapping path="/loginout"/>
+			<bean class="cn.taskoa.common.interceptor.AdminInterceptor" />
 		</mvc:interceptor>
 	</mvc:interceptors>
 
