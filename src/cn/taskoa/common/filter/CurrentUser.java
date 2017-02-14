@@ -3,14 +3,15 @@ package cn.taskoa.common.filter;
 import java.io.Serializable;
 
 public class CurrentUser implements Serializable {
-	
+
 	private static final long serialVersionUID = -2331332687362665600L;
-	
+
 	private int userid; // 用户id
 	private String loginname; // 用户登录名
 	private String username; // 用户姓名
 	private String password; // 密码
 	private boolean mobileLogin; // 是否手机登录
+	private String role; // 角色
 
 	public int getUserid() {
 		return userid;
@@ -50,6 +51,14 @@ public class CurrentUser implements Serializable {
 
 	public void setMobileLogin(boolean mobileLogin) {
 		this.mobileLogin = mobileLogin;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 }
