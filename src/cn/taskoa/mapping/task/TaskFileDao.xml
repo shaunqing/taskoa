@@ -139,16 +139,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		taskid = #{taskid}
 	</select>
 
-	<update id="updateTaskFiles" parameterType="TaskFile">
-		<foreach collection="list" item="item" index="index" open=""
-			close="" separator=";">
-			UPDATE t_taskfile
-			<set>taskfileurl = #{item.taskfileurl}</set>
-			WHERE
-			taskfileid = #{item.taskfileid}
-		</foreach>
-	</update>
-
 	<delete id="deleteTaksFile">
 		DELETE FROM t_taskfile WHERE taskfileid =
 		#{taskfileid}
